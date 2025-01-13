@@ -52,6 +52,20 @@ app.get('/api/test-db', async (req, res) => {
   }
 });
 
+// Test player creation endpoint
+app.post('/api/players', (req, res) => {
+  const { name, email } = req.body;
+
+  // Return the received data with a success message
+  res.status(201).json({
+    message: 'Player created successfully!',
+    player: {
+      name,
+      email,
+    },
+  });
+});
+
 
 
 // Start the server

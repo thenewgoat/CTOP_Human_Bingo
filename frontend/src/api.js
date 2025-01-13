@@ -1,6 +1,6 @@
 const BASE_URL =
   process.env.NODE_ENV === 'production'
-    ? 'https://your-backend.onrender.com/api' // Render backend URL for production
+    ? 'https://api.render.com/deploy/srv-cu2b0ml2ng1s73fuop9g?key=g7wLC5K8YCE' // Render backend URL for production
     : '/api'; // Proxy for local development
 
 // Function to create a player
