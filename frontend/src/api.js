@@ -1,6 +1,6 @@
 const BASE_URL =
   process.env.NODE_ENV === 'production'
-    ? 'https://ctop-human-bingo.onrender.com' // Render backend URL for production
+    ? 'https://ctop-human-bingo.onrender.com/api' // Render backend URL for production
     : '/api'; // Proxy for local development
 
 // Function to create a player

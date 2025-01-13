@@ -54,8 +54,9 @@ app.get('/api/test-db', async (req, res) => {
 
 // Test player creation endpoint
 app.post('/api/players', (req, res) => {
-  const { name, email } = req.body;
-
+  //const { name, email } = req.body;
+  //just send something whenever an api call is detected
+  res.json({ message: 'Player Creation request RECEIVED!' });
   // Return the received data with a success message
   res.status(201).json({
     message: 'Player created successfully!',
