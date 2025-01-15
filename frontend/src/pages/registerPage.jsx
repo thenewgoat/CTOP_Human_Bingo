@@ -9,7 +9,7 @@ const RegisterPage = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch('https://your-backend.onrender.com/api/players', {
+            const response = await fetch('https://ctop-human-bingo.onrender.com/api/players', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nickname, group_name: groupName }),
