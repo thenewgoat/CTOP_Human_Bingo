@@ -3,6 +3,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const { Pool } = require('pg');
+const QRCode = require('qrcode'); // For generating QR codes
 
 dotenv.config(); // Load environment variables
 
@@ -52,19 +53,51 @@ app.get('/api/test-db', async (req, res) => {
   }
 });
 
-// Test player creation endpoint
-app.post('/api/players', (req, res) => {
-  //const { name, email } = req.body;
-  //just send something whenever an api call is detected
-  res.json({ message: 'Player Creation request RECEIVED!' });
-  // Return the received data with a success message
-  res.status(201).json({
-    message: 'Player created successfully!',
-    player: {
-      name,
-      email,
-    },
-  });
+
+// Endpoint to register a new player
+app.post('/api/players', async (req, res) => {
+  const { nickname, group_name } = req.body;
+
+  if (!nickname || !group_name) {
+      return res.status(400).json({ error: 'Nickname and Group Name are required' });
+  }
+
+  try {
+      // Insert player into the database
+      const result = await pool.query(
+          'INSERT INTO players (nickname, group_name) VALUES ($1, $2) RETURNING *',
+          [nickname, group_name]
+      );
+
+      const player = result.rows[0];
+
+      // Generate a QR code for the player
+      const qrData = JSON.stringify({ id: player.id, group_name });
+      const qrCode = await QRCode.toDataURL(qrData); // Generate QR code as a Base64 string
+
+      // Update player record with the QR code
+      await pool.query('UPDATE players SET qr_code = $1 WHERE id = $2', [qrCode, player.id]);
+
+      // Return the player info, including the QR code
+      res.status(201).json({
+          message: 'Player registered successfully',
+          player: { ...player, qr_code: qrCode },
+      });
+  } catch (error) {
+      console.error('Error registering player:', error);
+      res.status(500).json({ error: 'Failed to register player' });
+  }
+});
+
+// Add a cleanup endpoint (for testing/admin use)
+app.delete('/api/players', async (req, res) => {
+  try {
+      await pool.query('DELETE FROM players');
+      res.status(200).json({ message: 'All players deleted successfully' });
+  } catch (error) {
+      console.error('Error deleting players:', error);
+      res.status(500).json({ error: 'Failed to delete players' });
+  }
 });
 
 
