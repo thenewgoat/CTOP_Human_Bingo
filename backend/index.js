@@ -12,8 +12,8 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Routes
-const playersRoutes = require("./routes/playersRoutes");
-app.use("/api/players", playersRoutes); // Mount the players-related routes
+const playerRoutes = require("./routes/playerRoutes");
+app.use("/api/players", playerRoutes); // Mount the players-related routes
 
 // Test route
 app.get("/", (req, res) => {
