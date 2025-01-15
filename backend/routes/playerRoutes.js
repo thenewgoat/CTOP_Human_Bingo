@@ -6,6 +6,8 @@ const pool = require("../db"); // Use the centralized database connection
 
 // Player Registration Endpoint
 router.post("/", async (req, res) => {
+
+  
   const { nickname, group_name } = req.body;
 
   if (!nickname || !group_name) {
@@ -42,7 +44,9 @@ router.post("/", async (req, res) => {
 
     // Generate a QR code for the player
     const qrData = JSON.stringify({ id: player.id, group_name });
+    console.log("QR Data:", qrData);
     const qrCode = await QRCode.toDataURL(qrData); // Generate QR code as Base64 string
+    console.log("QR Code:", qrCode);
 
     // Update the player record with the QR code
     await pool.query("UPDATE players SET qr_code = $1 WHERE id = $2", [qrCode, player.id]);
