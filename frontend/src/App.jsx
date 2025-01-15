@@ -5,6 +5,10 @@ import RegisterPage from './pages/RegisterPage';
 import { createPlayer, getBingoSheets, signTrait } from './api';
 
 const App = () => {
+  //const [player, setPlayer] = useState(null);
+  //const [bingoSheets, setBingoSheets] = useState([]);
+  const [message, setMessage] = useState('');
+
 
   return (
     <Router>
