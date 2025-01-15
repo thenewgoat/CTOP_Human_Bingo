@@ -1,9 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
-const pool = require("../db");
 const QRCode = require("qrcode");
-
+const pool = require("../db"); // Use the centralized database connection
 
 // Player Registration Endpoint
 router.post("/", async (req, res) => {
@@ -26,7 +25,7 @@ router.post("/", async (req, res) => {
       });
     }
 
-    // Insert player into the database
+    // Insert the new player into the database
     const result = await pool.query(
       "INSERT INTO players (nickname, group_name) VALUES ($1, $2) RETURNING *",
       [nickname, group_name]
@@ -36,23 +35,23 @@ router.post("/", async (req, res) => {
 
     // Generate a JWT for the player
     const token = jwt.sign(
-      { id: player.id, group_name },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { id: player.id, group_name }, // Payload
+      process.env.JWT_SECRET,       // Secret key
+      { expiresIn: "1h" }           // Token validity
     );
 
     // Generate a QR code for the player
     const qrData = JSON.stringify({ id: player.id, group_name });
-    const qrCode = await QRCode.toDataURL(qrData);
+    const qrCode = await QRCode.toDataURL(qrData); // Generate QR code as Base64 string
 
-    // Update player record with the QR code
+    // Update the player record with the QR code
     await pool.query("UPDATE players SET qr_code = $1 WHERE id = $2", [qrCode, player.id]);
 
-    // Return the player info, including the token and QR code
+    // Return the player info along with their token
     res.status(201).json({
       message: "Player registered successfully",
       player: { ...player, qr_code: qrCode },
-      token, // Send the token to the client
+      token, // Send token to the client
     });
   } catch (error) {
     console.error("Error registering player:", error);
@@ -60,4 +59,5 @@ router.post("/", async (req, res) => {
   }
 });
 
+// Export the router
 module.exports = router;

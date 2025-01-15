@@ -4,9 +4,18 @@ const RegisterPage = () => {
     const [nickname, setNickname] = useState('');
     const [groupName, setGroupName] = useState('');
     const [message, setMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!nickname || !groupName) {
+            setMessage('Both fields are required!');
+            return;
+        }
+
+        setIsLoading(true);
+        setMessage('');
 
         try {
             const response = await fetch('https://ctop-human-bingo.onrender.com/api/players', {
@@ -16,23 +25,27 @@ const RegisterPage = () => {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to register');
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to register');
             }
 
             const data = await response.json();
             setMessage(`Player registered successfully!`);
             console.log('Player data:', data);
 
-            // Redirect to the bingo sheet page (example)
+            // Redirect to the bingo sheet page
             window.location.href = `/bingo-sheet/${data.player.id}`;
         } catch (error) {
-            setMessage('Registration failed. Please try again.');
+            console.error('Error:', error);
+            setMessage(error.message || 'Registration failed. Please try again.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
         <div>
-            <h1>Register for Human Bingo</h1>
+            <h1>Fill in the blanks</h1>
             <form onSubmit={handleSubmit}>
                 <input
                     type="text"
@@ -48,7 +61,9 @@ const RegisterPage = () => {
                     onChange={(e) => setGroupName(e.target.value)}
                     required
                 />
-                <button type="submit">Register</button>
+                <button type="submit" disabled={isLoading}>
+                    {isLoading ? 'Registering...' : 'Register'}
+                </button>
             </form>
             {message && <p>{message}</p>}
         </div>
