@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import jwtDecode from "jwt-decode"; // Install using: npm install jwt-decode
 
 const RegisterPage = () => {
   const [nickname, setNickname] = useState("");
@@ -8,22 +7,14 @@ const RegisterPage = () => {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const navigate = useNavigate(); // For navigation
+  const navigate = useNavigate();
 
-  // Check if a valid JWT token exists and redirect
+  // Redirect if a JWT token exists
   useEffect(() => {
     const token = localStorage.getItem("playerToken");
-
     if (token) {
-      try {
-        const decoded = jwtDecode(token); // Decode the token to retrieve player ID
-        if (decoded && decoded.id) {
-          navigate(`/bingo-sheet/${decoded.id}`); // Redirect to bingo sheet page
-        }
-      } catch (error) {
-        console.error("Invalid token:", error);
-        localStorage.removeItem("playerToken"); // Remove invalid token
-      }
+      // Redirect to the game page directly
+      navigate("/game"); // Adjust the route based on your app structure
     }
   }, [navigate]);
 
@@ -55,13 +46,10 @@ const RegisterPage = () => {
 
       const data = await response.json();
       setMessage("Player registered successfully!");
-      console.log("Player data:", data);
-
-      // Save the JWT token to localStorage
+      // Store the JWT token in localStorage
       localStorage.setItem("playerToken", data.token);
-
-      // Redirect to the bingo sheet page
-      navigate(`/bingo-sheet/${data.player.id}`);
+      // Redirect to the game page
+      navigate(`/game/${data.player.id}`);
     } catch (error) {
       console.error("Error:", error);
       setMessage(error.message || "Registration failed. Please try again.");
@@ -72,7 +60,7 @@ const RegisterPage = () => {
 
   return (
     <div>
-      <h1>Fill in the blanks</h1>
+      <h1>Register</h1>
       <form onSubmit={handleSubmit}>
         <input
           type="text"
