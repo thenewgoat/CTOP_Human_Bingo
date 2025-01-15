@@ -20,7 +20,14 @@ export const generateBingoSheet = async (playerId) => {
 };
 
 export const fetchBingoSheet = async (playerId) => {
-  const response = await fetch(`/api/bingo/${playerId}`);
+  const token = localStorage.getItem("playerToken"); // Retrieve the JWT from localStorage
+
+  const response = await fetch(`/api/bingo/${playerId}`, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${token}`, // Include the token in the request
+    },
+  });
 
   if (!response.ok) {
     throw new Error("Failed to retrieve bingo sheet");
@@ -28,5 +35,6 @@ export const fetchBingoSheet = async (playerId) => {
 
   return response.json();
 };
+
 
 

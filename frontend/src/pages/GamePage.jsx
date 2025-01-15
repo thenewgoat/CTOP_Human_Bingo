@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { generateBingoSheet, fetchBingoSheet } from "../api";
+import { fetchBingoSheet } from "../api";
 
 const GamePage = ({ player }) => {
   const [bingoSheet, setBingoSheet] = useState(null);
@@ -19,18 +19,12 @@ const GamePage = ({ player }) => {
       setBoxes(data.boxes);
       setMessage("Bingo sheet loaded successfully!");
     } catch (error) {
-      setMessage("Failed to load bingo sheet");
-      console.error(error);
-    }
-  };
-
-  const handleGenerateBingoSheet = async () => {
-    try {
-      const data = await generateBingoSheet(player.id);
-      setMessage("Bingo sheet generated successfully!");
-      loadBingoSheet(player.id);
-    } catch (error) {
-      setMessage("Failed to generate bingo sheet");
+      if (error.message === "Failed to retrieve bingo sheet") {
+        setMessage("Access denied. Please register again.");
+        localStorage.removeItem("playerToken"); // Clear invalid token
+      } else {
+        setMessage("Failed to load bingo sheet");
+      }
       console.error(error);
     }
   };
@@ -39,7 +33,6 @@ const GamePage = ({ player }) => {
     <div>
       <h1>Welcome, {player.nickname}</h1>
       <h2>Group: {player.group_name}</h2>
-      <button onClick={handleGenerateBingoSheet}>Generate Bingo Sheet</button>
       <h3>Bingo Sheet</h3>
       {bingoSheet && (
         <div>
