@@ -1,43 +1,37 @@
 import React, { useState, useEffect } from "react";
-import { generateBingoSheet, fetchBingoSheets } from "../api";
+import { generateBingoSheet, fetchBingoSheet } from "../api";
 
 const GamePage = ({ player }) => {
-  const [bingoSheets, setBingoSheets] = useState([]);
+  const [bingoSheet, setBingoSheet] = useState(null);
+  const [boxes, setBoxes] = useState([]);
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Fetch bingo sheets when the component mounts
     if (player) {
-      fetchPlayerBingoSheets(player.id);
+      loadBingoSheet(player.id);
     }
   }, [player]);
 
-  const fetchPlayerBingoSheets = async (playerId) => {
+  const loadBingoSheet = async (playerId) => {
     try {
-      setLoading(true);
-      const data = await fetchBingoSheets(playerId);
-      setBingoSheets(data.bingoSheets);
-      setMessage("Bingo sheets loaded successfully");
+      const data = await fetchBingoSheet(playerId);
+      setBingoSheet(data.bingoSheet);
+      setBoxes(data.boxes);
+      setMessage("Bingo sheet loaded successfully!");
     } catch (error) {
-      setMessage("Failed to load bingo sheets");
+      setMessage("Failed to load bingo sheet");
       console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleGenerateBingoSheet = async () => {
     try {
-      setLoading(true);
       const data = await generateBingoSheet(player.id);
-      setBingoSheets(data.bingoSheet);
       setMessage("Bingo sheet generated successfully!");
+      loadBingoSheet(player.id);
     } catch (error) {
       setMessage("Failed to generate bingo sheet");
       console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -45,22 +39,21 @@ const GamePage = ({ player }) => {
     <div>
       <h1>Welcome, {player.nickname}</h1>
       <h2>Group: {player.group_name}</h2>
-      <div>
-        <button onClick={handleGenerateBingoSheet} disabled={loading}>
-          {loading ? "Generating..." : "Generate Bingo Sheet"}
-        </button>
-      </div>
-      <div>
-        <h3>Your Bingo Sheets</h3>
-        {loading && <p>Loading...</p>}
-        {!loading && bingoSheets.length === 0 && <p>No bingo sheets yet!</p>}
-        <div className="bingo-board">
-          {bingoSheets.map((square, index) => (
-            <div key={index} className={`bingo-square ${square.is_filled ? "filled" : ""}`}>
-              {square.trait}
-            </div>
-          ))}
+      <button onClick={handleGenerateBingoSheet}>Generate Bingo Sheet</button>
+      <h3>Bingo Sheet</h3>
+      {bingoSheet && (
+        <div>
+          <p>Sheet ID: {bingoSheet.id}</p>
+          <p>Completed: {bingoSheet.is_completed ? "Yes" : "No"}</p>
         </div>
+      )}
+      <div className="bingo-board">
+        {boxes.map((box, index) => (
+          <div key={index} className={`bingo-box ${box.is_signed ? "signed" : ""}`}>
+            <p>{box.trait}</p>
+            {box.is_signed && <p>Signed by Player ID: {box.signer_id}</p>}
+          </div>
+        ))}
       </div>
       <p>{message}</p>
     </div>

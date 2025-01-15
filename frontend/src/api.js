@@ -3,7 +3,6 @@ const BASE_URL =
     ? 'https://ctop-human-bingo.onrender.com/api' // Render backend URL for production
     : '/api'; // Proxy for local development
 
-
 export const generateBingoSheet = async (playerId) => {
   const response = await fetch("/api/bingo/generate", {
     method: "POST",
@@ -12,20 +11,22 @@ export const generateBingoSheet = async (playerId) => {
     },
     body: JSON.stringify({ playerId }),
   });
+
   if (!response.ok) {
     throw new Error("Failed to generate bingo sheet");
   }
+
   return response.json();
 };
 
-
-
-
-export const fetchBingoSheets = async (playerId) => {
+export const fetchBingoSheet = async (playerId) => {
   const response = await fetch(`/api/bingo/${playerId}`);
+
   if (!response.ok) {
-    throw new Error("Failed to fetch bingo sheets");
+    throw new Error("Failed to retrieve bingo sheet");
   }
+
   return response.json();
 };
+
 
