@@ -43,49 +43,41 @@ pool.query('SELECT NOW()', (err, res) => {
   }
 });
 
-// Example route to interact with DB
-app.get('/api/test-db', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT NOW()');
-    res.json({ message: 'Connected to database!', time: result.rows[0].now });
-  } catch (err) {
-    res.status(500).json({ error: 'Database query failed' });
-  }
-});
-
 
 // Endpoint to register a new player
 app.post('/api/players', async (req, res) => {
   const { nickname, group_name } = req.body;
 
   if (!nickname || !group_name) {
-      return res.status(400).json({ error: 'Nickname and Group Name are required' });
+    console.log('Invalid input:', req.body); // Log invalid input
+    return res.status(400).json({ error: 'Nickname and Group Name are required' });
   }
 
   try {
-      // Insert player into the database
-      const result = await pool.query(
-          'INSERT INTO players (nickname, group_name) VALUES ($1, $2) RETURNING *',
-          [nickname, group_name]
-      );
+    console.log('Inserting player into database...');
+    const result = await pool.query(
+      'INSERT INTO players (nickname, group_name) VALUES ($1, $2) RETURNING *',
+      [nickname, group_name]
+    );
 
-      const player = result.rows[0];
+    const player = result.rows[0];
+    console.log('Player ', player, ' inserted into group ', group_name);
 
-      // Generate a QR code for the player
-      const qrData = JSON.stringify({ id: player.id, group_name });
-      const qrCode = await QRCode.toDataURL(qrData); // Generate QR code as a Base64 string
+    console.log('Generating QR code...');
+    const qrData = JSON.stringify({ id: player.id, group_name });
+    const qrCode = await QRCode.toDataURL(qrData);
+    console.log('QR code generated');
 
-      // Update player record with the QR code
-      await pool.query('UPDATE players SET qr_code = $1 WHERE id = $2', [qrCode, player.id]);
+    console.log('Updating player record with QR code...');
+    await pool.query('UPDATE players SET qr_code = $1 WHERE id = $2', [qrCode, player.id]);
 
-      // Return the player info, including the QR code
-      res.status(201).json({
-          message: 'Player registered successfully',
-          player: { ...player, qr_code: qrCode },
-      });
+    res.status(201).json({
+      message: 'Player registered successfully',
+      player: { ...player, qr_code: qrCode },
+    });
   } catch (error) {
-      console.error('Error registering player:', error);
-      res.status(500).json({ error: 'Failed to register player' });
+    console.error('Error registering player:', error);
+    res.status(500).json({ error: 'Failed to register player' });
   }
 });
 
