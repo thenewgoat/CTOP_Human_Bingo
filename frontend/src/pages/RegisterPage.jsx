@@ -12,11 +12,11 @@ const RegisterPage = () => {
   // Redirect if a JWT token exists
   useEffect(() => {
     const token = localStorage.getItem("playerToken");
-    if (token) {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET); // Decode token to extract player ID
-        if (decoded && decoded.id) {
-          navigate(`/game/${decoded.id}`); // Redirect to the correct game page
-        }
+    const playerData = localStorage.getItem("playerData");
+
+    if (token && playerData) {
+      const parsedPlayerData = JSON.parse(playerData); // Retrieve saved player data
+      navigate(`/game/${parsedPlayerData.id}`); // Redirect to the correct game page
     }
   }, [navigate]);
 
@@ -48,8 +48,13 @@ const RegisterPage = () => {
 
       const data = await response.json();
       setMessage("Player registered successfully!");
+
       // Store the JWT token in localStorage
       localStorage.setItem("playerToken", data.token);
+
+      // Store the player data in localStorage
+      localStorage.setItem("playerData", JSON.stringify(data.player));
+
       // Redirect to the game page
       navigate(`/game/${data.player.id}`);
     } catch (error) {
@@ -57,7 +62,7 @@ const RegisterPage = () => {
       setMessage(error.message || "Registration failed. Please try again.");
     } finally {
       setIsLoading(false);
-    }      
+    }
   };
 
   return (
