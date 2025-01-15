@@ -4,6 +4,9 @@ const jwt = require("jsonwebtoken");
 const QRCode = require("qrcode");
 const pool = require("../db"); // Use the centralized database connection
 
+const jwtSecret = process.env.JWT_SECRET || "default_secret_key";
+
+
 // Player Registration Endpoint
 router.post("/", async (req, res) => {
 
@@ -38,29 +41,41 @@ router.post("/", async (req, res) => {
     // Generate a JWT for the player
     const token = jwt.sign(
       { id: player.id, group_name }, // Payload
-      process.env.JWT_SECRET,       // Secret key
+      jwtSecret,       // Secret key
       { expiresIn: "1h" }           // Token validity
     );
 
     // Generate a QR code for the player
     const qrData = JSON.stringify({ id: player.id, group_name });
-    console.log("QR Data:", qrData);
     const qrCode = await QRCode.toDataURL(qrData); // Generate QR code as Base64 string
-    console.log("QR Code:", qrCode);
+
 
     // Update the player record with the QR code
     await pool.query("UPDATE players SET qr_code = $1 WHERE id = $2", [qrCode, player.id]);
 
-    // Return the player info along with their token
-    res.status(201).json({
-      message: "Player registered successfully",
-      player: { ...player, qr_code: qrCode },
-      token, // Send token to the client
-    });
-  } catch (error) {
-    console.error("Error registering player:", error);
-    res.status(500).json({ error: "Failed to register player" });
-  }
+    try {
+        const generateResponse = await axios.post(
+          `${process.env.API_URL}/api/generate`, // Replace with your backend base URL
+          { playerId: player.id }
+        );
+  
+        const bingoSheetId = generateResponse.data.bingoSheetId;
+  
+        // Return the player info, token, and generated bingo sheet ID
+        res.status(201).json({
+          message: "Player registered and bingo sheet generated successfully",
+          player: { ...player, qr_code: qrCode },
+          token, // Send token to the client
+          bingoSheetId, // Include the bingo sheet ID in the response
+        });
+      } catch (error) {
+        console.error("Error generating bingo sheet:", error);
+        return res.status(500).json({ error: "Player registered but failed to generate bingo sheet" });
+      }
+    } catch (error) {
+      console.error("Error registering player:", error);
+      res.status(500).json({ error: "Failed to register player" });
+    }
 });
 
 // Export the router
