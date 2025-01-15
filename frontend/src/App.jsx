@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import RegisterPage from './pages/RegisterPage';
+
 import { createPlayer, getBingoSheets, signTrait } from './api';
 
 const App = () => {
