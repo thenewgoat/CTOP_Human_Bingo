@@ -13,8 +13,10 @@ const RegisterPage = () => {
   useEffect(() => {
     const token = localStorage.getItem("playerToken");
     if (token) {
-      // Redirect to the game page directly
-      navigate("/game"); // Adjust the route based on your app structure
+        const decoded = jwt.verify(token, process.env.JWT_SECRET); // Decode token to extract player ID
+        if (decoded && decoded.id) {
+          navigate(`/game/${decoded.id}`); // Redirect to the correct game page
+        }
     }
   }, [navigate]);
 
@@ -55,7 +57,7 @@ const RegisterPage = () => {
       setMessage(error.message || "Registration failed. Please try again.");
     } finally {
       setIsLoading(false);
-    }
+    }      
   };
 
   return (

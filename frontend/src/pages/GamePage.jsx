@@ -8,11 +8,15 @@ const GamePage = ({ player }) => {
 
   useEffect(() => {
     if (player) {
+      console.log("Player object in GamePage:", player); // Debugging log
       loadBingoSheet(player.id);
+    } else {
+      console.warn("Player object is null or undefined.");
     }
   }, [player]);
 
   const loadBingoSheet = async (playerId) => {
+    console.log("Loading bingo sheet for playerId:", playerId); // Debugging log
     try {
       const data = await fetchBingoSheet(playerId);
       setBingoSheet(data.bingoSheet);
