@@ -1,13 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
-const { Pool } = require("pg");
+const pool = require("../db");
 const QRCode = require("qrcode");
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
-});
 
 // Player Registration Endpoint
 router.post("/", async (req, res) => {
