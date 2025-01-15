@@ -40,3 +40,26 @@
 .read-the-docs {
   color: #888;
 }
+
+
+.bingo-board {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* For a 5x5 grid */
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.bingo-square {
+  background-color: #f0f0f0;
+  padding: 20px;
+  border: 1px solid #ccc;
+  text-align: center;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.bingo-square.filled {
+  background-color: #4caf50;
+  color: white;
+}

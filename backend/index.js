@@ -15,6 +15,11 @@ app.use(bodyParser.json());
 const playerRoutes = require("./routes/playerRoutes");
 app.use("/api/players", playerRoutes); // Mount the players-related routes
 
+
+const bingoRoutes = require("./routes/gameRoutes");
+app.use("/api/bingo", bingoRoutes);
+
+
 // Test route
 app.get("/", (req, res) => {
   res.send("Backend server is running!");
