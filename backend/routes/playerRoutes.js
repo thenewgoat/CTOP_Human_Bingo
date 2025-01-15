@@ -3,6 +3,7 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const QRCode = require("qrcode");
 const pool = require("../db"); // Use the centralized database connection
+const axios = require("axios"); // Import Axios for internal API calls
 
 const jwtSecret = process.env.JWT_SECRET || "default_secret_key";
 
