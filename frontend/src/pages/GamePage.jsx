@@ -56,7 +56,7 @@ const GamePage = ({ player }) => {
   
       // API call to update the database
       const response = await fetch(
-        "https://ctop-human-bingo.onrender.com/api/bingo/boxes/${selectedBox.id}/sign", 
+        `https://ctop-human-bingo.onrender.com/api/bingo/boxes/${selectedBox.id}/sign`, 
       {
         method: "POST",
         headers: {
