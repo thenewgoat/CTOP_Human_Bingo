@@ -63,7 +63,7 @@ const App = () => {
             )
           }
         />
-        {/* Fallback Route */}
+        {/* Fallback Route -- shouldn't be used by the internal logic (manual redirection handled in vercel.json*/}
         <Route 
           path="*" element={<Navigate to="/" replace />} 
         />

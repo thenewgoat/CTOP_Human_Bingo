@@ -6,6 +6,7 @@ const GamePage = ({ player }) => {
   const [bingoSheet, setBingoSheet] = useState(null);
   const [boxes, setBoxes] = useState([]);
   const [message, setMessage] = useState("");
+  const [activeTab, setActiveTab] = useState("bingoSheet"); // State to track active tab
 
   useEffect(() => {
     if (player) {
@@ -26,24 +27,60 @@ const GamePage = ({ player }) => {
   };
 
   return (
-    <div>
+    <div className="game-page">
       <h1>Welcome, {player.nickname}</h1>
       <h2>Group: {player.group_name}</h2>
-      <h3>Bingo Sheet</h3>
-      {bingoSheet && (
-        <div>
-          <p>Sheet ID: {bingoSheet.id}</p>
-          <p>Completed: {bingoSheet.is_completed ? "Yes" : "No"}</p>
-        </div>
-      )}
-      <div className="bingo-board">
-        {boxes.map((box, index) => (
-          <div key={index} className={`bingo-box ${box.is_signed ? "signed" : ""}`}>
-            <p>{box.trait}</p>
-            {box.is_signed && <p>Signed by Player ID: {box.signer_id}</p>}
-          </div>
-        ))}
+
+      {/* Tabs for switching views */}
+      <div className="tabs">
+        <button
+          className={`tab ${activeTab === "bingoSheet" ? "active" : ""}`}
+          onClick={() => setActiveTab("bingoSheet")}
+        >
+          Bingo Sheet
+        </button>
+        <button
+          className={`tab ${activeTab === "qrCode" ? "active" : ""}`}
+          onClick={() => setActiveTab("qrCode")}
+        >
+          QR Code
+        </button>
       </div>
+
+      {/* Tab Content */}
+      <div className="tab-content">
+        {activeTab === "bingoSheet" && (
+          <>
+            <h3>Bingo Sheet</h3>
+            {bingoSheet && (
+              <div>
+                <p>Sheet ID: {bingoSheet.id}</p>
+                <p>Completed: {bingoSheet.is_completed ? "Yes" : "No"}</p>
+              </div>
+            )}
+            <div className="bingo-board">
+              {boxes.map((box, index) => (
+                <div key={index} className={`bingo-box ${box.is_signed ? "signed" : ""}`}>
+                  <p>{box.trait}</p>
+                  {box.is_signed && <p>Signed by Player ID: {box.signer_id}</p>}
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {activeTab === "qrCode" && (
+          <>
+            <h3>Your QR Code</h3>
+            {player.qr_code ? (
+              <img src={player.qr_code} alt="Player QR Code" className="qr-code" />
+            ) : (
+              <p>No QR code available.</p>
+            )}
+          </>
+        )}
+      </div>
+
       <p>{message}</p>
     </div>
   );
