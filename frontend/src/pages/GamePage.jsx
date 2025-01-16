@@ -43,7 +43,9 @@ const GamePage = ({ player }) => {
     try {
       const scannedPlayer = JSON.parse(qrData);
 
-      console.log("Scanned player nickname:", scannedPlayer.nickname, "Scanned playe id:", scannedPlayer.playerId);
+      console.log("Scanned player data:", scannedPlayer);
+
+      console.log("Scanned player nickname:", scannedPlayer.nickname, "Scanned player id:", scannedPlayer.playerId);
 
       // Validation checks
       if (!scannedPlayer.nickname || !scannedPlayer.playerId) {
