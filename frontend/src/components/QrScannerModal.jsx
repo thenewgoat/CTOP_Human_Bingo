@@ -28,6 +28,9 @@ const QrScannerModal = ({ onClose, onScan }) => {
           style={previewStyle}
           onError={handleError}
           onScan={handleScan}
+          constraints={{
+            facingMode: "environment", // Use the back camera
+          }}
         />
         <button className="close-button" onClick={onClose}>
           Cancel
