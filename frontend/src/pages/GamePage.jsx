@@ -28,8 +28,8 @@ const GamePage = ({ player }) => {
       console.error("Error loading bingo sheet:", error); // Debugging log
       if (error.message === "Failed to retrieve bingo sheet") {
         setMessage("Access denied. Please register again.");
-        localStorage.removeItem("playerToken"); // Clear invalid token
-        localStorage.removeItem("playerData");
+        sessionStorage.removeItem("playerToken"); // Clear invalid token
+        sessionStorage.removeItem("playerData");
       } else {
         setMessage("Failed to load bingo sheet. Please try again later.");
       }

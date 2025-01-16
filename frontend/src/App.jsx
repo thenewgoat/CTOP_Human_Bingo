@@ -7,19 +7,17 @@ import GamePage from "./pages/GamePage";
 const App = () => {
   const [player, setPlayer] = useState(null);
 
-  // Load player from localStorage on app load
+  // Load player from sessionStorage on app load
   useEffect(() => {
-    const savedPlayer = localStorage.getItem("playerData");
-    console.log("Loaded player from localStorage:", savedPlayer); // Debug log
+    const savedPlayer = sessionStorage.getItem("playerData");
     if (savedPlayer) {
       setPlayer(JSON.parse(savedPlayer)); // Parse and set the player data
     }
   }, []);
 
   const handleRegister = (playerData) => {
-    console.log("Player registered:", playerData); // Debug log
-    setPlayer(playerData);
-    localStorage.setItem("playerData", JSON.stringify(playerData)); // Save to localStorage
+    setPlayer(playerData); // Update state
+    sessionStorage.setItem("playerData", JSON.stringify(playerData)); // Persist to sessionStorage
   };
 
   return (

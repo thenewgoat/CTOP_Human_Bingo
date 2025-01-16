@@ -4,7 +4,7 @@ const BASE_URL =
     : "/api"; // Proxy for local development
 
 export const fetchBingoSheet = async (playerId) => {
-  const token = localStorage.getItem("playerToken"); // Retrieve the JWT from localStorage
+  const token = sessionStorage.getItem("playerToken"); // Retrieve the JWT from sessionStorage
 
   const response = await fetch(`${BASE_URL}/bingo/${playerId}`, {
     method: "GET",
