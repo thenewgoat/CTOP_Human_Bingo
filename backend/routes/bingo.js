@@ -3,7 +3,8 @@ const router = express.Router();
 const pool = require("../db"); // Centralized database connection
 
 // Update Bingo Box after Successful Scan
-router.post("/boxes/:id/sign", async (req, res) => {
+router.post("/bingo/boxes/:id/sign", async (req, res) => {
+
   const { id } = req.params; // Bingo box ID
   const { signer_id, signed_at } = req.body; // Signer ID and timestamp
 
