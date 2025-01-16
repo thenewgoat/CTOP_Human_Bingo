@@ -1,7 +1,3 @@
-import React, { useState, useEffect } from "react";
-import { fetchBingoSheet } from "../api";
-import "./theme/BingoBoard.css"; // Import the CSS file
-
 const GamePage = ({ player }) => {
   const [bingoSheet, setBingoSheet] = useState(null);
   const [boxes, setBoxes] = useState([]);
@@ -25,6 +21,11 @@ const GamePage = ({ player }) => {
     }
   };
 
+  const handleBoxClick = (boxIndex) => {
+    console.log(`Box clicked: ${boxIndex}`, boxes[boxIndex]);
+    // Additional functionalities to be implemented here
+  };
+
   return (
     <div>
       <h1>Welcome, {player.nickname}</h1>
@@ -38,7 +39,11 @@ const GamePage = ({ player }) => {
       )}
       <div className="bingo-board">
         {boxes.map((box, index) => (
-          <div key={index} className={`bingo-box ${box.is_signed ? "signed" : ""}`}>
+          <div
+            key={index}
+            className={`bingo-box ${box.is_signed ? "signed" : ""} ${index === 12 ? "center" : ""}`}
+            onClick={() => handleBoxClick(index)}
+          >
             <p>{box.trait}</p>
             {box.is_signed && <p>Signed by Player ID: {box.signer_id}</p>}
           </div>

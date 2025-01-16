@@ -5,37 +5,49 @@
     display: grid;
     grid-template-columns: repeat(5, 1fr); /* 5 columns */
     grid-template-rows: repeat(5, 1fr);   /* 5 rows */
-    gap: 10px; /* Space between boxes */
-    max-width: 500px; /* Set a max width for the grid */
+    gap: 5px; /* Reduce gap to mimic a bingo board closely */
+    max-width: 400px; /* Adjust width for a compact board */
     margin: 20px auto; /* Center the board */
-  }
-  
-  /* Style for each bingo box */
-  .bingo-box {
+    border: 2px solid #333; /* Add a border around the entire board */
+    background-color: #fff; /* Set a neutral background */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* Style for each bingo box */
+.bingo-box {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid #ccc; /* Add a border */
+    border: 2px solid #ddd; /* Add a subtle border */
     background-color: #f9f9f9; /* Light background */
-    padding: 10px;
-    height: 100px; /* Fixed height to make it square */
+    padding: 5px; /* Adjust padding */
+    height: 80px; /* Fixed height for uniform squares */
+    width: 80px; /* Match height for square */
     text-align: center;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: bold;
-    border-radius: 8px;
-    transition: background-color 0.3s ease;
-  }
-  
-  /* Style for a signed bingo box */
-  .bingo-box.signed {
+    border-radius: 4px;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+/* Style for a signed bingo box */
+.bingo-box.signed {
     background-color: #d4edda; /* Light green for signed boxes */
     color: #155724; /* Dark green text for contrast */
     border-color: #c3e6cb; /* Green border */
-  }
-  
-  /* Optional hover effect */
-  .bingo-box:hover {
+}
+
+/* Optional hover effect */
+.bingo-box:hover {
     cursor: pointer;
-    background-color: #f1f1f1; /* Slightly darker background on hover */
-  }
-  
+    background-color: #f0f0f0; /* Slightly darker background on hover */
+    transform: scale(1.05); /* Slight zoom effect */
+}
+
+/* Special center box styling (optional for "Free" box) */
+.bingo-box.center {
+    background-color: #fbe8a6; /* Light yellow for center */
+    font-style: italic;
+    color: #856404;
+    border: 2px dashed #d2a20c; /* Dashed border for emphasis */
+}
