@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { fetchBingoSheet } from "../api";
-import "../theme/BingoBoard.css"; // Import the CSS file
+import QrScannerModal from "../components/QrScannerModal";
+import "../theme/BingoBoard.css";
 
 const GamePage = ({ player }) => {
   const [bingoSheet, setBingoSheet] = useState(null);
   const [boxes, setBoxes] = useState([]);
   const [message, setMessage] = useState("");
-  const [activeTab, setActiveTab] = useState("bingoSheet"); // State to track active tab
+  const [activeTab, setActiveTab] = useState("bingoSheet");
+  const [showScanner, setShowScanner] = useState(false); // State for showing the QR scanner
+  const [selectedBox, setSelectedBox] = useState(null); // Track which box is selected for signing
 
   useEffect(() => {
     if (player) {
@@ -26,12 +29,52 @@ const GamePage = ({ player }) => {
     }
   };
 
+  const handleBoxClick = (box) => {
+    if (box.is_signed) {
+      alert(`Box already signed by ${box.signer_nickname} on ${box.timestamp}`);
+      return;
+    }
+    setSelectedBox(box); // Set the box to be signed
+    setShowScanner(true); // Show the QR scanner
+  };
+
+  const handleQrScan = (qrData) => {
+    try {
+      const scannedPlayer = JSON.parse(qrData);
+
+      // Validation checks
+      if (!scannedPlayer.nickname) {
+        throw new Error("Invalid QR code. Missing player nickname.");
+      }
+      if (scannedPlayer.group_name !== player.group_name) {
+        throw new Error("Player is not in the same group.");
+      }
+
+      // Update the signed box
+      setBoxes((prevBoxes) =>
+        prevBoxes.map((box) =>
+          box.id === selectedBox.id
+            ? {
+                ...box,
+                is_signed: true,
+                signer_nickname: scannedPlayer.nickname,
+                timestamp: new Date().toISOString(),
+              }
+            : box
+        )
+      );
+      setMessage(`Box signed by ${scannedPlayer.nickname}!`);
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
   return (
     <div className="game-page">
       <h1>Welcome, {player.nickname}</h1>
       <h2>Group: {player.group_name}</h2>
 
-      {/* Tabs for switching views */}
+      {/* Tabs */}
       <div className="tabs">
         <button
           className={`tab ${activeTab === "bingoSheet" ? "active" : ""}`}
@@ -59,10 +102,14 @@ const GamePage = ({ player }) => {
               </div>
             )}
             <div className="bingo-board">
-              {boxes.map((box, index) => (
-                <div key={index} className={`bingo-box ${box.is_signed ? "signed" : ""}`}>
+              {boxes.map((box) => (
+                <div
+                  key={box.id}
+                  className={`bingo-box ${box.is_signed ? "signed" : ""}`}
+                  onClick={() => handleBoxClick(box)}
+                >
                   <p>{box.trait}</p>
-                  {box.is_signed && <p>Signed by Player ID: {box.signer_id}</p>}
+                  {box.is_signed && <p>Signed by: {box.signer_nickname}</p>}
                 </div>
               ))}
             </div>
@@ -80,6 +127,14 @@ const GamePage = ({ player }) => {
           </>
         )}
       </div>
+
+      {/* QR Scanner Modal */}
+      {showScanner && (
+        <QrScannerModal
+          onClose={() => setShowScanner(false)}
+          onScan={handleQrScan}
+        />
+      )}
 
       <p>{message}</p>
     </div>
