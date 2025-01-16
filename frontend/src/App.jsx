@@ -11,7 +11,21 @@ const App = () => {
   useEffect(() => {
     const savedPlayer = localStorage.getItem("playerData");
     if (savedPlayer) {
-      setPlayer(JSON.parse(savedPlayer)); // Parse and set the player data
+      const playerData = JSON.parse(savedPlayer);
+      
+      // Check if registration is older than 1 hour
+      const createdAt = new Date(playerData.created_at); // Parse created_at timestamp
+      const now = new Date();
+      const oneHourInMillis = 60 * 60 * 1000;
+
+      if (now - createdAt > oneHourInMillis) {
+        // Registration expired
+        localStorage.removeItem("playerData"); // Clear expired data
+        localStorage.removeItem("playerToken"); // Clear token
+        setPlayer(null); // Reset state
+      } else {
+        setPlayer(playerData); // Set valid player data
+      }
     }
   }, []);
 
@@ -48,6 +62,10 @@ const App = () => {
               <Navigate to="/register" replace /> // Redirect if not registered
             )
           }
+        />
+        {/* Fallback Route */}
+        <Route 
+          path="*" element={<Navigate to="/" replace />} 
         />
       </Routes>
     </Router>
