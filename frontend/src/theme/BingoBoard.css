@@ -1,0 +1,41 @@
+/* BingoBoard.css */
+
+/* Style for the entire bingo board */
+.bingo-board {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 columns */
+    grid-template-rows: repeat(5, 1fr);   /* 5 rows */
+    gap: 10px; /* Space between boxes */
+    max-width: 500px; /* Set a max width for the grid */
+    margin: 20px auto; /* Center the board */
+  }
+  
+  /* Style for each bingo box */
+  .bingo-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ccc; /* Add a border */
+    background-color: #f9f9f9; /* Light background */
+    padding: 10px;
+    height: 100px; /* Fixed height to make it square */
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+  }
+  
+  /* Style for a signed bingo box */
+  .bingo-box.signed {
+    background-color: #d4edda; /* Light green for signed boxes */
+    color: #155724; /* Dark green text for contrast */
+    border-color: #c3e6cb; /* Green border */
+  }
+  
+  /* Optional hover effect */
+  .bingo-box:hover {
+    cursor: pointer;
+    background-color: #f1f1f1; /* Slightly darker background on hover */
+  }
+  

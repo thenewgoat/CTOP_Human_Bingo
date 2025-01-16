@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { fetchBingoSheet } from "../api";
+import "./theme/BingoBoard.css"; // Import the CSS file
 
 const GamePage = ({ player }) => {
   const [bingoSheet, setBingoSheet] = useState(null);
