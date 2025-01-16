@@ -72,6 +72,18 @@ const GamePage = ({ player }) => {
         const error = await response.json();
         throw new Error(error.error || "Failed to sign the box.");
       }
+
+      const data = await response.json(); // Parse JSON response
+      console.log("Response from server:", data); // Log the full response
+
+
+      if (data.isBingo) {
+        alert("Congratulations! Bingo achieved!"); // Display an alert
+        setMessage("Bingo achieved!");
+        bingoSheet.is_completed = true; // Update the bingo sheet in the frontend state
+      } else {
+        setMessage(data.message || `Box signed by ${scannedPlayer.nickname}.`);
+      }
   
       // Update the box in the frontend state
       setBoxes((prevBoxes) =>

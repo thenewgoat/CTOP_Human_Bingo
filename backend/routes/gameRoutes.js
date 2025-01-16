@@ -38,9 +38,6 @@ function checkBingo(boxes) {
   return false;
 }
 
-
-
-
 /*
     Actual Routes all below
 */
