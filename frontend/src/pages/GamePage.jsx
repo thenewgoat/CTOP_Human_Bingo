@@ -3,6 +3,7 @@ import { fetchBingoSheet } from "../api";
 import QrScannerModal from "../components/QrScannerModal";
 import "../theme/BingoBoard.css";
 
+
 const GamePage = ({ player }) => {
   const [bingoSheet, setBingoSheet] = useState(null);
   const [boxes, setBoxes] = useState([]);
@@ -43,8 +44,8 @@ const GamePage = ({ player }) => {
       const scannedPlayer = JSON.parse(qrData);
 
       // Validation checks
-      if (!scannedPlayer.nickname) {
-        throw new Error("Invalid QR code. Missing player nickname.");
+      if (!scannedPlayer.nickname || !scannedPlayer.playerId) {
+        throw new Error("Invalid QR code. Player does not exist.");
       }
       if (scannedPlayer.group_name !== player.group_name) {
         throw new Error("Player is not in the same group.");

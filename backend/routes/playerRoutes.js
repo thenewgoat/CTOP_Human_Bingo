@@ -44,7 +44,7 @@ router.post("/", async (req, res) => {
     );
 
     // Generate a QR code for the player
-    const qrData = JSON.stringify({ id: player.id, group_name });
+    const qrData = JSON.stringify({ id: player.id, nickname, group_name });
     const qrCode = await QRCode.toDataURL(qrData); // Generate QR code as Base64 string
 
     // Update the player record with the QR code
