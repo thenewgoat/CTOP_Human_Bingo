@@ -9,6 +9,7 @@ router.get("/:playerId", authenticateToken, async (req, res) => {
 
   // Ensure the token belongs to the player requesting the data
   if (!req.player || req.player.id !== parseInt(playerId)) {
+    console.error("Player ID mismatch or invalid token.");
     return res.status(403).json({ error: "Access denied. Invalid token or player mismatch." });
   }
 
