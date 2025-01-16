@@ -39,19 +39,39 @@ const GamePage = ({ player }) => {
     setShowScanner(true); // Show the QR scanner
   };
 
-  const handleQrScan = (qrData) => {
+  
+
+  const handleQrScan = async (qrData) => {
     try {
       const scannedPlayer = JSON.parse(qrData);
-
+  
       // Validation checks
-      if (!scannedPlayer.nickname || !scannedPlayer.id) {
-        throw new Error("Invalid QR code. Player does not exist.");
+      if (!scannedPlayer.nickname || !scannedPlayer.id || !scannedPlayer.group_name) {
+        throw new Error("Invalid QR code. Missing required fields.");
       }
+  
       if (scannedPlayer.group_name !== player.group_name) {
         throw new Error("Player is not in the same group.");
       }
-
-      // Update the signed box
+  
+      // API call to update the database
+      const response = await fetch(`/api/bingo/boxes/${selectedBox.id}/sign`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          signer_id: scannedPlayer.id,
+          signed_at: new Date().toISOString(),
+        }),
+      });
+  
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to sign the box.");
+      }
+  
+      // Update the box in the frontend state
       setBoxes((prevBoxes) =>
         prevBoxes.map((box) =>
           box.id === selectedBox.id
@@ -64,8 +84,10 @@ const GamePage = ({ player }) => {
             : box
         )
       );
+  
       setMessage(`Box signed by ${scannedPlayer.nickname}!`);
     } catch (error) {
+      console.error("Error during QR scan:", error.message);
       alert(error.message);
     }
   };
