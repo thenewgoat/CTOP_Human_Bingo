@@ -3,6 +3,42 @@ const router = express.Router();
 const pool = require("../db");
 const authenticateToken = require("../middleware/authenticateTokens");
 
+/*
+    Helper function to check for bingo
+*/
+
+function checkBingo(boxes) {
+  // Create a 5x5 grid
+  const grid = Array(5)
+    .fill(null)
+    .map(() => Array(5).fill(false));
+
+  // Populate the grid with signed status
+  boxes.forEach((box) => {
+    const row = Math.floor(box.id % 5); // Replace with proper row calculation
+    const col = Math.floor(box.id / 5); // Replace with proper col calculation
+    grid[row][col] = box.is_signed;
+  });
+
+  // Check rows and columns for bingo
+  for (let i = 0; i < 5; i++) {
+    if (grid[i].every((val) => val)) return true; // Row
+    if (grid.map((row) => row[i]).every((val) => val)) return true; // Column
+  }
+
+  // Check diagonals for bingo
+  const leftDiagonal = grid.map((row, i) => row[i]);
+  const rightDiagonal = grid.map((row, i) => row[4 - i]);
+  if (leftDiagonal.every((val) => val) || rightDiagonal.every((val) => val)) return true;
+
+  return false;
+}
+
+
+
+/*
+    Actual Routes all below
+*/
 
 // Retrieve a bingo sheet for a player
 router.get("/:playerId", authenticateToken, async (req, res) => {
@@ -76,26 +112,33 @@ router.post("/boxes/:id/sign", async (req, res) => {
       [signer_id, signed_at, id]
     );
 
-    // Check if all boxes in the sheet are now signed
-    const incompleteBoxes = await pool.query(
-      "SELECT * FROM bingo_boxes WHERE bingo_sheet_id = $1 AND is_signed = false",
+    // Query all boxes for this bingo sheet
+    const allBoxes = await pool.query(
+      "SELECT * FROM bingo_boxes WHERE bingo_sheet_id = $1",
       [box.bingo_sheet_id]
     );
 
-    if (incompleteBoxes.rowCount === 0) {
-      // Mark the bingo sheet as completed
+    const boxes = allBoxes.rows;
+
+    // Check for bingo
+    const isBingo = checkBingo(boxes); // Custom function to evaluate bingo
+    if (isBingo) {
       await pool.query(
         "UPDATE bingo_sheets SET is_completed = true, completed_at = NOW() WHERE id = $1",
         [box.bingo_sheet_id]
       );
+
+      return res.status(200).json({ message: "Bingo achieved!", isBingo: true });
     }
 
-    res.status(200).json({ message: "Box signed successfully." });
+    res.status(200).json({ message: "Box signed successfully.", isBingo: false });
   } catch (error) {
     console.error("Error updating bingo box:", error);
     res.status(500).json({ error: "Failed to update bingo box." });
   }
 });
+
+
 
 
 
