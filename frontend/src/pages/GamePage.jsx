@@ -41,9 +41,9 @@ const GamePage = ({ player }) => {
 
   const handleQrScan = (qrData) => {
     try {
-      const base64Payload = qrData.split(",")[1]; // Remove the "data:image/png;base64," prefix
-      const jsonPayload = atob(base64Payload); // Decode the Base64 string
-      const scannedPlayer = JSON.parse(jsonPayload);
+      const scannedPlayer = JSON.parse(qrData);
+
+      console.log("Scanned player:", scannedPlayer);
 
       // Validation checks
       if (!scannedPlayer.nickname || !scannedPlayer.playerId) {
