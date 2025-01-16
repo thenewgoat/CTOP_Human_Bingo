@@ -39,7 +39,7 @@ const GamePage = ({ player }) => {
     setShowScanner(true); // Show the QR scanner
   };
 
-  
+
 
   const handleQrScan = async (qrData) => {
     try {
@@ -55,7 +55,9 @@ const GamePage = ({ player }) => {
       }
   
       // API call to update the database
-      const response = await fetch(`/api/bingo/boxes/${selectedBox.id}/sign`, {
+      const response = await fetch(
+        "https://ctop-human-bingo.onrender.com/api/bingo/boxes/${selectedBox.id}/sign", 
+      {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
