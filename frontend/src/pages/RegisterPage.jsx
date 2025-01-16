@@ -1,24 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const RegisterPage = () => {
+const RegisterPage = ({ onRegister }) => {
   const [nickname, setNickname] = useState("");
   const [groupName, setGroupName] = useState("");
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
-
-  // Redirect if a JWT token exists
-  useEffect(() => {
-    const token = localStorage.getItem("playerToken");
-    const playerData = localStorage.getItem("playerData");
-
-    if (token && playerData) {
-      const parsedPlayerData = JSON.parse(playerData); // Retrieve saved player data
-      navigate(`/game/${parsedPlayerData.id}`); // Redirect to the correct game page
-    }
-  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,14 +38,15 @@ const RegisterPage = () => {
       const data = await response.json();
       setMessage("Player registered successfully!");
 
-      // Store the JWT token in localStorage
+      // Store player data and token
       localStorage.setItem("playerToken", data.token);
-
-      // Store the player data in localStorage
       localStorage.setItem("playerData", JSON.stringify(data.player));
 
+      // Update the App state with the registered player
+      onRegister(data.player);
+
       // Redirect to the game page
-      navigate(`/game/${data.player.id}`);
+      navigate("/game");
     } catch (error) {
       console.error("Error:", error);
       setMessage(error.message || "Registration failed. Please try again.");

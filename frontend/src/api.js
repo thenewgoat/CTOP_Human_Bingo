@@ -1,21 +1,19 @@
 const BASE_URL =
   process.env.NODE_ENV === "production"
-    ? "https://ctop-human-bingo.onrender.com/api" // Render backend URL for production
+    ? "https://ctop-human-bingo.onrender.com/api" // Render backend URL
     : "/api"; // Proxy for local development
 
 export const fetchBingoSheet = async (playerId) => {
-  const token = sessionStorage.getItem("playerToken"); // Retrieve the JWT from sessionStorage
+  const token = localStorage.getItem("playerToken");
 
   const response = await fetch(`${BASE_URL}/bingo/${playerId}`, {
     method: "GET",
     headers: {
-      Authorization: `Bearer ${token}`, // Include the token in the request
+      Authorization: `Bearer ${token}`, // Include the token
     },
   });
 
   if (!response.ok) {
-    const errorData = await response.json();
-    console.error("Failed to fetch bingo sheet:", errorData); // Debugging log
     throw new Error("Failed to retrieve bingo sheet");
   }
 

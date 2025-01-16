@@ -7,9 +7,9 @@ import GamePage from "./pages/GamePage";
 const App = () => {
   const [player, setPlayer] = useState(null);
 
-  // Load player from sessionStorage on app load
+  // Load player from localStorage on app load
   useEffect(() => {
-    const savedPlayer = sessionStorage.getItem("playerData");
+    const savedPlayer = localStorage.getItem("playerData");
     if (savedPlayer) {
       setPlayer(JSON.parse(savedPlayer)); // Parse and set the player data
     }
@@ -17,24 +17,35 @@ const App = () => {
 
   const handleRegister = (playerData) => {
     setPlayer(playerData); // Update state
-    sessionStorage.setItem("playerData", JSON.stringify(playerData)); // Persist to sessionStorage
+    localStorage.setItem("playerData", JSON.stringify(playerData)); // Persist to localStorage
   };
 
   return (
     <Router>
       <Routes>
+        {/* Home Page */}
         <Route path="/" element={<HomePage />} />
+
+        {/* Register Page */}
         <Route
           path="/register"
-          element={<RegisterPage onRegister={handleRegister} />}
+          element={
+            player ? (
+              <Navigate to="/game" replace /> // Redirect if already registered
+            ) : (
+              <RegisterPage onRegister={handleRegister} />
+            )
+          }
         />
+
+        {/* Game Page */}
         <Route
-          path="/game/:playerId"
+          path="/game"
           element={
             player ? (
               <GamePage player={player} />
             ) : (
-              <Navigate to="/register" replace /> // Redirect if player is not registered
+              <Navigate to="/register" replace /> // Redirect if not registered
             )
           }
         />
