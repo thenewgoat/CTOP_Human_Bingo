@@ -8,6 +8,9 @@ const authenticateToken = require("../middleware/authenticateTokens");
 */
 
 function checkBingo(boxes) {
+  // Find the smallest box ID to normalize the grid indices
+  const minId = Math.min(...boxes.map((box) => box.id));
+
   // Create a 5x5 grid
   const grid = Array(5)
     .fill(null)
@@ -15,15 +18,16 @@ function checkBingo(boxes) {
 
   // Populate the grid with signed status
   boxes.forEach((box) => {
-    const row = Math.floor(box.id % 5); // Replace with proper row calculation
-    const col = Math.floor(box.id / 5); // Replace with proper col calculation
+    const normalizedId = box.id - minId; // Normalize ID
+    const row = Math.floor(normalizedId / 5); // Calculate row
+    const col = normalizedId % 5; // Calculate column
     grid[row][col] = box.is_signed;
   });
 
   // Check rows and columns for bingo
   for (let i = 0; i < 5; i++) {
-    if (grid[i].every((val) => val)) return true; // Row
-    if (grid.map((row) => row[i]).every((val) => val)) return true; // Column
+    if (grid[i].every((val) => val)) return true; // Row is complete
+    if (grid.map((row) => row[i]).every((val) => val)) return true; // Column is complete
   }
 
   // Check diagonals for bingo
@@ -33,6 +37,7 @@ function checkBingo(boxes) {
 
   return false;
 }
+
 
 
 
