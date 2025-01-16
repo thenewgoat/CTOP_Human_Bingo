@@ -110,7 +110,7 @@ const GamePage = ({ player }) => {
                   onClick={() => handleBoxClick(box)}
                 >
                   <p>{box.trait}</p>
-                  {box.is_signed && <p>Signed by: {box.signer_nickname}</p>}
+                  {box.is_signed}
                 </div>
               ))}
             </div>
