@@ -77,7 +77,7 @@ const GamePage = ({ player }) => {
       console.log("Response from server:", data); // Log the full response
 
 
-      if (data.isBingo) {
+      if (data.isBingo && bingo_sheet.is_completed === false) {
         alert("Congratulations! Bingo achieved!"); // Display an alert
         setMessage("Bingo achieved!");
         bingoSheet.is_completed = true; // Update the bingo sheet in the frontend state

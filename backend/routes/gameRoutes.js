@@ -122,9 +122,15 @@ router.post("/boxes/:id/sign", async (req, res) => {
 
     const boxes = allBoxes.rows;
 
+    // Query sheet for completion status
+    const sheet = await pool.query(
+      "SELECT * FROM bingo_sheets WHERE id = $1",
+      [box.bingo_sheet_id]
+    );
+
     // Check for bingo
-    const isBingo = checkBingo(boxes); // Custom function to evaluate bingo
-    if (isBingo) {
+    const isBingo = checkBingo(boxes);
+    if (isBingo && sheet.rows[0].is_completed === false) { // if bingo and not already completed
       await pool.query(
         "UPDATE bingo_sheets SET is_completed = true, completed_at = NOW() WHERE id = $1",
         [box.bingo_sheet_id]
