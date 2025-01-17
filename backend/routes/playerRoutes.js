@@ -40,7 +40,7 @@ router.post("/", async (req, res) => {
     const token = jwt.sign(
       { id: player.id, group_name }, // Payload
       jwtSecret, // Secret key
-      { expiresIn: "1h" } // Token validity
+      { expiresIn: "72h" } // Token validity
     );
 
     // Generate a QR code for the player
