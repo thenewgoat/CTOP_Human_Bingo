@@ -9,6 +9,13 @@ const RegisterPage = ({ onRegister }) => {
 
   const navigate = useNavigate();
 
+  const groupOptions = [
+    "C1", "C2", "C3", "C4",
+    "R1", "R2", "R3", "R4",
+    "E1", "E2", "E3", "E4",
+    "S1", "S2", "S3", "S4",
+  ];
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -66,13 +73,20 @@ const RegisterPage = ({ onRegister }) => {
           onChange={(e) => setNickname(e.target.value)}
           required
         />
-        <input
-          type="text"
-          placeholder="Group Name"
+        <select
           value={groupName}
           onChange={(e) => setGroupName(e.target.value)}
           required
-        />
+        >
+          <option value="" disabled>
+            Select a group
+          </option>
+          {groupOptions.map((group) => (
+            <option key={group} value={group}>
+              {group}
+            </option>
+          ))}
+        </select>
         <button type="submit" disabled={isLoading}>
           {isLoading ? "Registering..." : "Register"}
         </button>
