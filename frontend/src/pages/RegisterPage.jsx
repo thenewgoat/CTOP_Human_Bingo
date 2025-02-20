@@ -29,7 +29,7 @@ const RegisterPage = ({ onRegister }) => {
 
     try {
       const response = await fetch(
-        "https://ctop-human-bingo.onrender.com/api/players",
+        "https://ctophumanbingo-production.up.railway.app/api/players",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
