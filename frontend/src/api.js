@@ -1,6 +1,6 @@
 const BASE_URL =
   process.env.NODE_ENV === "production"
-    ? "https://ctophumanbingo-production.up.railway.app/api" // Render backend URL
+    ? "https://ctophumanbingo-production.up.railway.app/api" // Railway backend URL
     : "/api"; // Proxy for local development
 
 export const fetchBingoSheet = async (playerId) => {
