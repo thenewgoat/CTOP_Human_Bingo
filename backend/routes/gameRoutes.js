@@ -212,17 +212,13 @@ router.post("/boxes/:id/sign", async (req, res) => {
           newBingos,
           clanName,
         ]);
-      }
+      };
+      return res.status(200).json({ message: "Bingo!", isBingo: true });
     }
 
     // Return the result
-    // Possibly tell the client how many new lines were formed
     return res.status(200).json({
-      message: newBingos > 0 
-        ? `${newBingos} new Bingo line(s) formed!` 
-        : "Box signed successfully. No new Bingos formed.",
-      bingosAfter,
-      newBingos,
+      message: "Bingo box signed successfully",
     });
   } catch (error) {
     console.error("Error updating bingo box:", error);
