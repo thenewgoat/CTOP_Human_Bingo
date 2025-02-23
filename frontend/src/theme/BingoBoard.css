@@ -24,6 +24,7 @@
     font-weight: bold;
     border-radius: 8px;
     transition: background-color 0.3s ease;
+    color: #000000; /* Black text color */
   }
   
   /* Style for a signed bingo box */
