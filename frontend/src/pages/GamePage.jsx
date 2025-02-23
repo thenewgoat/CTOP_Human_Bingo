@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { ArrowUpDown, Trophy } from "lucide-react";
 import { fetchBingoSheet } from "../api";
 import QrScannerModal from "../components/QrScannerModal";
 import "../theme/BingoBoard.css";
@@ -256,74 +257,101 @@ const GamePage = ({ player }) => {
  * LeaderboardTable: simple table to show clan / group / individual data
  */
 const LeaderboardTable = ({ data, type }) => {
-  // data is expected to be an array of objects, e.g.
-  // For "clan":  [{ clan_name: 'C', score: 10 }, ...]
-  // For "group": [{ group_name: 'C1', clan_name: 'C', score: 4 }, ...]
-  // For "individual": [{ player_id: 1, nickname: 'Alice', group_name: 'C3', score: 7 }, ...]
-
   if (!Array.isArray(data) || data.length === 0) {
-    return <p>No leaderboard data.</p>;
+    return <p className="text-center text-gray-600 py-4">No leaderboard data available.</p>;
   }
 
-  // Sort by score descending as example
-  const sortedData = [...data].sort((a, b) => (b.score || 0) - (a.score || 0));
+  const [sortField, setSortField] = useState("score");
+  const [sortOrder, setSortOrder] = useState("desc");
+
+  const handleSort = (field) => {
+    const order = sortField === field && sortOrder === "desc" ? "asc" : "desc";
+    setSortField(field);
+    setSortOrder(order);
+  };
+
+  const sortedData = [...data].sort((a, b) => {
+    if (sortOrder === "asc") return (a[sortField] || 0) > (b[sortField] || 0) ? 1 : -1;
+    return (a[sortField] || 0) < (b[sortField] || 0) ? 1 : -1;
+  });
 
   return (
-    <table className="leaderboard-table">
-      <thead>
-        <tr>
-          <th>Rank</th>
-          {type === "clan" && (
-            <>
-              <th>Clan</th>
-              <th>Score</th>
-            </>
-          )}
-          {type === "group" && (
-            <>
-              <th>Group</th>
-              <th>Clan</th>
-              <th>Score</th>
-            </>
-          )}
-          {type === "individual" && (
-            <>
-              <th>Nickname</th>
-              <th>Group</th>
-              <th>Score</th>
-            </>
-          )}
-        </tr>
-      </thead>
-      <tbody>
-        {sortedData.map((row, index) => (
-          <tr key={index}>
-            <td>{index + 1}</td>
+    <div className="overflow-x-auto p-4">
+      <table className="min-w-full bg-white shadow-lg rounded-lg overflow-hidden border">
+        <thead className="bg-gray-800 text-white">
+          <tr>
+            <th className="px-4 py-3 text-left">Rank</th>
             {type === "clan" && (
               <>
-                <td>{row.clan_name || "?"}</td>
-                <td>{row.score || 0}</td>
+                <th className="px-4 py-3 text-left cursor-pointer" onClick={() => handleSort("clan_name")}>
+                  Clan <ArrowUpDown size={14} className="inline ml-1" />
+                </th>
+                <th className="px-4 py-3 text-left cursor-pointer" onClick={() => handleSort("score")}>
+                  Score <ArrowUpDown size={14} className="inline ml-1" />
+                </th>
               </>
             )}
             {type === "group" && (
               <>
-                <td>{row.group_name || "?"}</td>
-                <td>{row.clan_name || "?"}</td>
-                <td>{row.score || 0}</td>
+                <th className="px-4 py-3 text-left cursor-pointer" onClick={() => handleSort("group_name")}>
+                  Group <ArrowUpDown size={14} className="inline ml-1" />
+                </th>
+                <th className="px-4 py-3 text-left cursor-pointer" onClick={() => handleSort("clan_name")}>
+                  Clan <ArrowUpDown size={14} className="inline ml-1" />
+                </th>
+                <th className="px-4 py-3 text-left cursor-pointer" onClick={() => handleSort("score")}>
+                  Score <ArrowUpDown size={14} className="inline ml-1" />
+                </th>
               </>
             )}
             {type === "individual" && (
               <>
-                <td>{row.nickname || "?"}</td>
-                <td>{row.group_name || "?"}</td>
-                <td>{row.score || 0}</td>
+                <th className="px-4 py-3 text-left cursor-pointer" onClick={() => handleSort("nickname")}>
+                  Nickname <ArrowUpDown size={14} className="inline ml-1" />
+                </th>
+                <th className="px-4 py-3 text-left cursor-pointer" onClick={() => handleSort("group_name")}>
+                  Group <ArrowUpDown size={14} className="inline ml-1" />
+                </th>
+                <th className="px-4 py-3 text-left cursor-pointer" onClick={() => handleSort("score")}>
+                  Score <ArrowUpDown size={14} className="inline ml-1" />
+                </th>
               </>
             )}
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {sortedData.map((row, index) => (
+            <tr key={index} className={`border-b ${index === 0 ? "bg-yellow-100" : "hover:bg-gray-100"}`}>
+              <td className="px-4 py-3">
+                {index === 0 ? <Trophy className="text-yellow-500" size={16} /> : index + 1}
+              </td>
+              {type === "clan" && (
+                <>
+                  <td className="px-4 py-3">{row.clan_name || "?"}</td>
+                  <td className="px-4 py-3 font-bold">{row.score || 0}</td>
+                </>
+              )}
+              {type === "group" && (
+                <>
+                  <td className="px-4 py-3">{row.group_name || "?"}</td>
+                  <td className="px-4 py-3">{row.clan_name || "?"}</td>
+                  <td className="px-4 py-3 font-bold">{row.score || 0}</td>
+                </>
+              )}
+              {type === "individual" && (
+                <>
+                  <td className="px-4 py-3">{row.nickname || "?"}</td>
+                  <td className="px-4 py-3">{row.group_name || "?"}</td>
+                  <td className="px-4 py-3 font-bold">{row.score || 0}</td>
+                </>
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 };
+
 
 export default GamePage;
