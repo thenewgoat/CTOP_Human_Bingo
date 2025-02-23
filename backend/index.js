@@ -19,6 +19,10 @@ app.use("/api/players", playerRoutes); // Mount the players-related routes
 const bingoRoutes = require("./routes/gameRoutes");
 app.use("/api/bingo", bingoRoutes);
 
+const leaderboardRoutes = require("./routes/leaderboardRoutes");
+app.use("/api/leaderboard", leaderboardRoutes);
+
+
 
 // Test route
 app.get("/", (req, res) => {

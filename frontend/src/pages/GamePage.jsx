@@ -18,7 +18,7 @@ const GamePage = ({ player }) => {
     }
   }, [player]);
 
-  const loadBingoSheet = async (playerId) => {
+  const loadBingoSheet = async (playerId) => {  
     try {
       const data = await fetchBingoSheet(playerId);
       setBingoSheet(data.bingoSheet);
