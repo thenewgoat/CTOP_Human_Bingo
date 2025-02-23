@@ -68,9 +68,9 @@ const RegisterPage = ({ onRegister }) => {
   };
 
   return (
-    <div>
+    <div className="register-container">
       <h1>Register</h1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="register-form">
         {/* Nickname Input */}
         <input
           type="text"
@@ -87,7 +87,7 @@ const RegisterPage = ({ onRegister }) => {
           required
         >
           <option value="" disabled>
-            Select Letter (C, R, E, S)
+            Select Clan (C, R, E, S)
           </option>
           {letterOptions.map((letter) => (
             <option key={letter} value={letter}>
@@ -103,7 +103,7 @@ const RegisterPage = ({ onRegister }) => {
           required
         >
           <option value="" disabled>
-            Select Number (1, 2, 3, 4)
+            Select Group No. (1, 2, 3, 4)
           </option>
           {numberOptions.map((num) => (
             <option key={num} value={num}>
@@ -112,11 +112,11 @@ const RegisterPage = ({ onRegister }) => {
           ))}
         </select>
 
+        {/* Register Button */}
         <button type="submit" disabled={isLoading}>
           {isLoading ? "Registering..." : "Register"}
         </button>
       </form>
-      {message && <p>{message}</p>}
     </div>
   );
 };
