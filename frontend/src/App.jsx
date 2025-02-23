@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import RegisterPage from "./pages/RegisterPage";
 import HomePage from "./pages/HomePage";
 import GamePage from "./pages/GamePage";
-import './app.css'
+
 
 const App = () => {
   const [player, setPlayer] = useState(null);
