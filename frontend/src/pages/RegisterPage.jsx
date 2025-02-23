@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+
+
 const RegisterPage = ({ onRegister }) => {
   const [nickname, setNickname] = useState("");
   const [groupLetter, setGroupLetter] = useState("");
@@ -21,7 +23,7 @@ const RegisterPage = ({ onRegister }) => {
     const finalGroupName = groupLetter + groupNumber;
 
     // Validate fields
-    if (!nickname || !finalGroupName) {
+    if (!nickname || !groupLetter || !groupNumber) {
       setMessage("All fields are required!");
       return;
     }

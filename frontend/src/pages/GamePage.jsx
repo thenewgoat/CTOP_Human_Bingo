@@ -54,9 +54,9 @@ const GamePage = ({ player }) => {
         throw new Error("Invalid QR code. Missing required fields.");
       }
 
-      if (scannedPlayer.group_name !== player.group_name) {
-        throw new Error("Player is not in the same group.");
-      }
+      //if (scannedPlayer.group_name !== player.group_name) {
+      //  throw new Error("Player is not in the same group.");
+      //}
 
       // API call to update the database
       const response = await fetch(
