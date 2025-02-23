@@ -129,6 +129,16 @@ router.post("/boxes/:id/sign", async (req, res) => {
 
     // 7) Update the player's, group's, and clan's score by the difference (newBingos)
     //    First, find the player's group and clan
+
+    const bingoSheet = sheetRes.rows[0];
+    if (bingosAfter > 0 && bingoSheet.is_completed === false) {
+      // Mark sheet as completed if it wasn't already
+      await pool.query(
+        "UPDATE bingo_sheets SET is_completed = true, completed_at = NOW() WHERE id = $1",
+        [bingoSheet.id]
+      );
+    }
+    
     const playerResult = await pool.query("SELECT * FROM players WHERE id = $1", [signer_id]);
     if (playerResult.rows.length === 0) {
       return res.status(404).json({ error: "Signer player not found." });
