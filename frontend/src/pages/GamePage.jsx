@@ -3,14 +3,17 @@ import { fetchBingoSheet } from "../api";
 import QrScannerModal from "../components/QrScannerModal";
 import "../theme/BingoBoard.css";
 
-
 const GamePage = ({ player }) => {
   const [bingoSheet, setBingoSheet] = useState(null);
   const [boxes, setBoxes] = useState([]);
   const [message, setMessage] = useState("");
   const [activeTab, setActiveTab] = useState("bingoSheet");
-  const [showScanner, setShowScanner] = useState(false); // State for showing the QR scanner
-  const [selectedBox, setSelectedBox] = useState(null); // Track which box is selected for signing
+  const [showScanner, setShowScanner] = useState(false);
+  const [selectedBox, setSelectedBox] = useState(null);
+
+  // Leaderboard states
+  const [leaderboardTab, setLeaderboardTab] = useState("clan"); // "clan", "group", "individual"
+  const [leaderboardData, setLeaderboardData] = useState([]);
 
   useEffect(() => {
     if (player) {
@@ -18,7 +21,7 @@ const GamePage = ({ player }) => {
     }
   }, [player]);
 
-  const loadBingoSheet = async (playerId) => {  
+  const loadBingoSheet = async (playerId) => {
     try {
       const data = await fetchBingoSheet(playerId);
       setBingoSheet(data.bingoSheet);
@@ -30,79 +33,113 @@ const GamePage = ({ player }) => {
     }
   };
 
+  // When user clicks on a box
   const handleBoxClick = (box) => {
     if (box.is_signed) {
       alert(`Box already signed by ${box.signer_nickname} on ${box.timestamp}`);
       return;
     }
-    setSelectedBox(box); // Set the box to be signed
-    setShowScanner(true); // Show the QR scanner
+    setSelectedBox(box);
+    setShowScanner(true);
   };
 
-
-
+  // Handle the QR scan
   const handleQrScan = async (qrData) => {
     try {
       const scannedPlayer = JSON.parse(qrData);
-  
+
       // Validation checks
       if (!scannedPlayer.nickname || !scannedPlayer.id || !scannedPlayer.group_name) {
         throw new Error("Invalid QR code. Missing required fields.");
       }
-  
+
       if (scannedPlayer.group_name !== player.group_name) {
         throw new Error("Player is not in the same group.");
       }
-  
+
       // API call to update the database
       const response = await fetch(
         `https://ctop-human-bingo.onrender.com/api/bingo/boxes/${selectedBox.id}/sign`, 
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          signer_id: scannedPlayer.id,
-          signed_at: new Date().toISOString(),
-        }),
-      });
-  
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            signer_id: scannedPlayer.id,
+            signed_at: new Date().toISOString(),
+          }),
+        }
+      );
+
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || "Failed to sign the box.");
       }
 
-      const data = await response.json(); // Parse JSON response
-      console.log("Response from server:", data); // Log the full response
+      const data = await response.json();
+      console.log("Response from server:", data);
 
-
-      if (data.isBingo && bingo_sheet.is_completed === false) {
-        alert("Congratulations! Bingo achieved!"); // Display an alert
+      // If there's a bingo and the sheet is not yet completed
+      if (data.isBingo && bingoSheet.is_completed === false) {
+        alert("Congratulations! Bingo achieved!");
         setMessage("Bingo achieved!");
-        bingoSheet.is_completed = true; // Update the bingo sheet in the frontend state
+        bingoSheet.is_completed = true; // update local state
       } else {
         setMessage(data.message || `Box signed by ${scannedPlayer.nickname}.`);
       }
-  
-      // Update the box in the frontend state
+
+      // Update local boxes state
       setBoxes((prevBoxes) =>
-        prevBoxes.map((box) =>
-          box.id === selectedBox.id
+        prevBoxes.map((b) =>
+          b.id === selectedBox.id
             ? {
-                ...box,
+                ...b,
                 is_signed: true,
                 signer_nickname: scannedPlayer.nickname,
                 timestamp: new Date().toISOString(),
               }
-            : box
+            : b
         )
       );
-  
+
       setMessage(`Box signed by ${scannedPlayer.nickname}!`);
     } catch (error) {
       console.error("Error during QR scan:", error.message);
       alert(error.message);
+    }
+  };
+
+  // Tabs: Bingo Sheet, QR Code, Leaderboard
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+    if (tab === "leaderboard") {
+      // Load the default sub-tab (clan) or keep the existing sub-tab
+      loadLeaderboardData(leaderboardTab);
+    }
+  };
+
+  // Leaderboard Sub-Tabs: clan, group, individual
+  const handleLeaderboardTabClick = (subTab) => {
+    setLeaderboardTab(subTab);
+    loadLeaderboardData(subTab);
+  };
+
+  // Fetch the leaderboard data based on the sub-tab
+  const loadLeaderboardData = async (type) => {
+    try {
+      setMessage("Loading leaderboard...");
+      // Example endpoint: /api/leaderboard?type=clan / group / individual
+      const res = await fetch(`https://ctop-human-bingo.onrender.com/api/leaderboard?type=${type}`);
+      if (!res.ok) {
+        throw new Error("Failed to fetch leaderboard");
+      }
+      const data = await res.json();
+      setLeaderboardData(data);
+      setMessage(`Loaded ${type} leaderboard successfully!`);
+    } catch (error) {
+      console.error("Error loading leaderboard:", error);
+      setMessage("Failed to load leaderboard.");
     }
   };
 
@@ -111,24 +148,30 @@ const GamePage = ({ player }) => {
       <h1>Welcome, {player.nickname}</h1>
       <h2>Group: {player.group_name}</h2>
 
-      {/* Tabs */}
+      {/* Main Tabs */}
       <div className="tabs">
         <button
           className={`tab ${activeTab === "bingoSheet" ? "active" : ""}`}
-          onClick={() => setActiveTab("bingoSheet")}
+          onClick={() => handleTabClick("bingoSheet")}
         >
           Bingo Sheet
         </button>
         <button
           className={`tab ${activeTab === "qrCode" ? "active" : ""}`}
-          onClick={() => setActiveTab("qrCode")}
+          onClick={() => handleTabClick("qrCode")}
         >
           QR Code
         </button>
+        <button
+          className={`tab ${activeTab === "leaderboard" ? "active" : ""}`}
+          onClick={() => handleTabClick("leaderboard")}
+        >
+          Leaderboard
+        </button>
       </div>
 
-      {/* Tab Content */}
       <div className="tab-content">
+        {/* Bingo Sheet */}
         {activeTab === "bingoSheet" && (
           <>
             <h3>Bingo Sheet</h3>
@@ -146,13 +189,14 @@ const GamePage = ({ player }) => {
                   onClick={() => handleBoxClick(box)}
                 >
                   <p>{box.trait}</p>
-                  {box.is_signed}
+                  {box.is_signed && <p>Signed by {box.signer_nickname}</p>}
                 </div>
               ))}
             </div>
           </>
         )}
 
+        {/* QR Code */}
         {activeTab === "qrCode" && (
           <>
             <h3>Your QR Code</h3>
@@ -161,6 +205,36 @@ const GamePage = ({ player }) => {
             ) : (
               <p>No QR code available.</p>
             )}
+          </>
+        )}
+
+        {/* Leaderboard */}
+        {activeTab === "leaderboard" && (
+          <>
+            <h3>Leaderboard</h3>
+            {/* Sub-tabs for clan, group, individual */}
+            <div className="leaderboard-subtabs">
+              <button
+                className={`subtab ${leaderboardTab === "clan" ? "active" : ""}`}
+                onClick={() => handleLeaderboardTabClick("clan")}
+              >
+                Clans
+              </button>
+              <button
+                className={`subtab ${leaderboardTab === "group" ? "active" : ""}`}
+                onClick={() => handleLeaderboardTabClick("group")}
+              >
+                Groups
+              </button>
+              <button
+                className={`subtab ${leaderboardTab === "individual" ? "active" : ""}`}
+                onClick={() => handleLeaderboardTabClick("individual")}
+              >
+                Individuals
+              </button>
+            </div>
+
+            <LeaderboardTable data={leaderboardData} type={leaderboardTab} />
           </>
         )}
       </div>
@@ -175,6 +249,80 @@ const GamePage = ({ player }) => {
 
       <p>{message}</p>
     </div>
+  );
+};
+
+/**
+ * LeaderboardTable: simple table to show clan / group / individual data
+ */
+const LeaderboardTable = ({ data, type }) => {
+  // data is expected to be an array of objects, e.g.
+  // For "clan":  [{ clan_name: 'C', score: 10 }, ...]
+  // For "group": [{ group_name: 'C1', clan_name: 'C', score: 4 }, ...]
+  // For "individual": [{ player_id: 1, nickname: 'Alice', group_name: 'C3', score: 7 }, ...]
+
+  if (!Array.isArray(data) || data.length === 0) {
+    return <p>No leaderboard data.</p>;
+  }
+
+  // Sort by score descending as example
+  const sortedData = [...data].sort((a, b) => (b.score || 0) - (a.score || 0));
+
+  return (
+    <table className="leaderboard-table">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          {type === "clan" && (
+            <>
+              <th>Clan</th>
+              <th>Score</th>
+            </>
+          )}
+          {type === "group" && (
+            <>
+              <th>Group</th>
+              <th>Clan</th>
+              <th>Score</th>
+            </>
+          )}
+          {type === "individual" && (
+            <>
+              <th>Nickname</th>
+              <th>Group</th>
+              <th>Score</th>
+            </>
+          )}
+        </tr>
+      </thead>
+      <tbody>
+        {sortedData.map((row, index) => (
+          <tr key={index}>
+            <td>{index + 1}</td>
+            {type === "clan" && (
+              <>
+                <td>{row.clan_name || "?"}</td>
+                <td>{row.score || 0}</td>
+              </>
+            )}
+            {type === "group" && (
+              <>
+                <td>{row.group_name || "?"}</td>
+                <td>{row.clan_name || "?"}</td>
+                <td>{row.score || 0}</td>
+              </>
+            )}
+            {type === "individual" && (
+              <>
+                <td>{row.nickname || "?"}</td>
+                <td>{row.group_name || "?"}</td>
+                <td>{row.score || 0}</td>
+              </>
+            )}
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 };
 
