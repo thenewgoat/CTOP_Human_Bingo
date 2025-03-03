@@ -74,10 +74,18 @@ router.post("/", async (req, res) => {
       const shuffledTraits = [...TRAITS_POOL].sort(() => 0.5 - Math.random());
       const selectedTraits = shuffledTraits.slice(0, 25);
 
+      const testTrait = "Can solve a Rubik's Cube";
+      const boxInsertValue = `(${bingoSheetId}, '${testTrait}')`;
+      const testQuery = `INSERT INTO bingo_boxes (bingo_sheet_id, trait) VALUES ${boxInsertValue}`;
+      console.log("Test Query:", testQuery);
+      await pool.query(testQuery);
+
       // Insert the boxes into the bingo_boxes table
       const boxInsertValues = selectedTraits
-        .map((trait) => `(${bingoSheetId}, '${trait}')`)
+        .map((trait) => `(${bingoSheetId}, '${trait.replace(/'/g, "''")}')`)
         .join(", ");
+      
+      
         
       await pool.query(
         `INSERT INTO bingo_boxes (bingo_sheet_id, trait) VALUES ${boxInsertValues}`

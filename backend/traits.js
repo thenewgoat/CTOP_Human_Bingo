@@ -87,7 +87,7 @@ const TRAITS_POOL = [
   "Knows how to play pool",
   "Has never broken a bone",
   "Is a fan of anime",
-  "Can recite π to 10+ digits",
+  "Can recite pi to 10+ digits",
   "Can tie a cherry stem with their tongue",
   "Can do the splits"
 ];
