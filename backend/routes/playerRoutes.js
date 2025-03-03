@@ -33,7 +33,9 @@ router.post("/", async (req, res) => {
       "SELECT COUNT(*) FROM players WHERE group_name = $1",
       [group_name]
     );
-    if (groupPlayers.rows[0].count >= 25) {
+
+    //TO-DO: Change the maximum number of players allowed in a group
+    if (groupPlayers.rows[0].count >= 35) {
       return res.status(403).json({ 
         error: "Group has reached the maximum number of players"
       });

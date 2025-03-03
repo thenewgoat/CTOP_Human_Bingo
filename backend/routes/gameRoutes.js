@@ -163,14 +163,8 @@ router.post("/boxes/:id/sign", async (req, res) => {
 
     // 5) Compute how many new bingos formed
     const newBingos = bingosAfter - bingosBefore;
-
-    // 6) If there's a new Bingo line, we might update the sheet’s is_completed if you want to 
-    //    treat even 1 Bingo as "completed." 
-    //    For example: if (bingosAfter > 0 && !sheet.is_completed) { ... } 
-    //    However, in your logic, "is_completed" might be only if max bingos are achieved or some other condition.
-
-    // 7) Update the player's, group's, and clan's score by the difference (newBingos)
-    //    First, find the player's group and clan
+    console.log("Player ", signer_id, " signing player", id, "'s box at", signed_at);
+    console.log(`Bingos before: ${bingosBefore}, after: ${bingosAfter}, new: ${newBingos}`);
 
     const sheetResult = await pool.query(
       "SELECT * FROM bingo_sheets WHERE player_id = $1 ORDER BY created_at DESC LIMIT 1",
