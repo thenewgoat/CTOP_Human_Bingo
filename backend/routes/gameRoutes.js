@@ -172,7 +172,7 @@ router.post("/boxes/:id/sign", async (req, res) => {
     // 7) Update the player's, group's, and clan's score by the difference (newBingos)
     //    First, find the player's group and clan
 
-    const bingoSheet = sheetRes.rows[0];
+    const bingoSheet = sheetResult.rows[0];
     if (bingosAfter > 0 && bingoSheet.is_completed === false) {
       // Mark sheet as completed if it wasn't already
       await pool.query(
