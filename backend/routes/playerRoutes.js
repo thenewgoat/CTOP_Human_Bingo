@@ -28,6 +28,17 @@ router.post("/", async (req, res) => {
       });
     }
 
+    // Check if group has maximum number of players
+    const groupPlayers = await pool.query(
+      "SELECT COUNT(*) FROM players WHERE group_name = $1",
+      [group_name]
+    );
+    if (groupPlayers.rows[0].count >= 25) {
+      return res.status(403).json({ 
+        error: "Group has reached the maximum number of players"
+      });
+    }
+
     // Insert the new player into the database
     const result = await pool.query(
       "INSERT INTO players (nickname, group_name) VALUES ($1, $2) RETURNING *",
