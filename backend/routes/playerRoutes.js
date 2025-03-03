@@ -78,6 +78,7 @@ router.post("/", async (req, res) => {
       const boxInsertValues = selectedTraits
         .map((trait) => `(${bingoSheetId}, '${trait}')`)
         .join(", ");
+        
       await pool.query(
         `INSERT INTO bingo_boxes (bingo_sheet_id, trait) VALUES ${boxInsertValues}`
       );
