@@ -139,9 +139,9 @@ router.post("/boxes/:id/sign", async (req, res) => {
 
 
     // 2) Retrieve all boxes for the bingo sheet (BEFORE signing)
-    const bingosBefore = await pool.query("SELECT score FROM players WHERE id = $1", [playerId]);
+    const playerSheetBefore = await pool.query("SELECT * FROM players WHERE id = $1", [playerId]);
+    const bingosBefore = playerSheetBefore.rows[0].score;
 
-    
     // 3) Sign the box
     await pool.query(
       "UPDATE bingo_boxes SET is_signed = true, signer_id = $1, signed_at = $2 WHERE id = $3",
