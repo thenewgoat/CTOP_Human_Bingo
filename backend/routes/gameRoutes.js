@@ -139,19 +139,15 @@ router.post("/boxes/:id/sign", async (req, res) => {
 
 
     // 2) Retrieve all boxes for the bingo sheet (BEFORE signing)
-    const allBoxesBefore = await pool.query(
-      "SELECT * FROM bingo_boxes WHERE bingo_sheet_id = $1 ORDER BY id",
-      [box.bingo_sheet_id]
-    );
-    const boxesBefore = allBoxesBefore.rows;
-    // Count bingos before
-    const bingosBefore = countBingos(boxesBefore);
+    const bingosBefore = await pool.query("SELECT score FROM players WHERE id = $1", [playerId]);
 
+    
     // 3) Sign the box
     await pool.query(
       "UPDATE bingo_boxes SET is_signed = true, signer_id = $1, signed_at = $2 WHERE id = $3",
       [signer_id, signed_at, id]
     );
+
 
     // 4) Re-fetch all boxes (AFTER signing)
     const allBoxesAfter = await pool.query(
@@ -159,7 +155,6 @@ router.post("/boxes/:id/sign", async (req, res) => {
       [box.bingo_sheet_id]
     );
     const boxesAfter = allBoxesAfter.rows;
-    // Count bingos after
     const bingosAfter = countBingos(boxesAfter);
 
     // 5) Compute how many new bingos formed
@@ -167,11 +162,11 @@ router.post("/boxes/:id/sign", async (req, res) => {
     console.log("Player ", signer_id, " signing player ", playerId, "'s box at", signed_at);
     console.log(`Bingos before: ${bingosBefore}, after: ${bingosAfter}, new: ${newBingos}`);
 
+
     const sheetResult = await pool.query(
       "SELECT * FROM bingo_sheets WHERE player_id = $1 ORDER BY created_at DESC LIMIT 1",
       [box.bingo_sheet_id]
     );
-
     const bingoSheet = sheetResult.rows[0];
 
     if (bingosAfter > 0 && bingoSheet.is_completed === false) {
