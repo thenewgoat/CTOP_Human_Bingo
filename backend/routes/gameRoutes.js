@@ -163,7 +163,7 @@ router.post("/boxes/:id/sign", async (req, res) => {
 
     // 5) Compute how many new bingos formed
     const newBingos = bingosAfter - bingosBefore;
-    console.log("Player ", signer_id, " signing player", id, "'s box at", signed_at);
+    console.log("Player ", signer_id, " signing player ", signer_id, "'s box at", signed_at);
     console.log(`Bingos before: ${bingosBefore}, after: ${bingosAfter}, new: ${newBingos}`);
 
     const sheetResult = await pool.query(
