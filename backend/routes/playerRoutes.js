@@ -87,6 +87,8 @@ router.post("/", async (req, res) => {
         `INSERT INTO bingo_boxes (bingo_sheet_id, trait) VALUES ${boxInsertValues}`
       );
 
+      console.log("Player", player.id, "registered and bingo sheet generated successfully");
+
       // Return the player info, token, and generated bingo sheet ID
       res.status(201).json({
         message: "Player registered and bingo sheet generated successfully",
