@@ -102,7 +102,8 @@ router.get("/:playerId", authenticateToken, async (req, res) => {
 router.post("/boxes/:id/sign", async (req, res) => {
   const { id } = req.params;       // Bingo box ID
   const { signer_id, signed_at } = req.body; // Player signing the box + timestamp
-  const { playerId } = await pool.query("SELECT bingo_sheet_id FROM bingo_boxes WHERE id = $1", [id]);
+  const bingo_sheet_result = await pool.query("SELECT bingo_sheet_id FROM bingo_boxes WHERE id = $1", [id]);
+  const { playerId } = bingo_sheet_result.rows[0];
 
   if (!signer_id || !signed_at) {
     return res
