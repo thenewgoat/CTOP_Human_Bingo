@@ -104,7 +104,7 @@ router.post("/boxes/:id/sign", async (req, res) => {
   const { signer_id, signed_at } = req.body; // Player signing the box + timestamp
   const bingo_sheet_result = await pool.query("SELECT bingo_sheet_id FROM bingo_boxes WHERE id = $1", [id]);
   console.log("bingo_sheet_result", bingo_sheet_result);
-  const { playerId } = bingo_sheet_result.rows[0];
+  const { playerId } = bingo_sheet_result.rows[0].bingo_sheet_id;
   console.log("playerId", playerId);
 
   if (!signer_id || !signed_at) {
@@ -142,11 +142,9 @@ router.post("/boxes/:id/sign", async (req, res) => {
 
 
     // 2) Retrieve all boxes for the bingo sheet (BEFORE signing)
-    const playerSheetBeforeQuery = await pool.query("SELECT * FROM players WHERE id = $1", [playerId]);
-    console.log("playerSheetBeforeQuery", playerSheetBeforeQuery);
-    const playerSheetBefore = playerSheetBeforeQuery.rows[0];
-    console.log("playerSheetBefore", playerSheetBefore);
-    const bingosBefore = playerSheetBefore.score;
+    const playerSheetBefore = await pool.query("SELECT score FROM players WHERE id = $1", [playerId]);
+    console.log("playerSheetBeforeQuery", playerSheetBefore);
+    const bingosBefore = playerSheetBefore.rows[0].score;
     console.log("bingosBefore", bingosBefore);
 
     // 3) Sign the box
